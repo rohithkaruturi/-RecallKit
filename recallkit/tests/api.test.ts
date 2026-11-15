@@ -153,4 +153,17 @@ describe('TASK 5 — Backend API Development (Express Endpoints)', () => {
       expect(res.body.error.code).toBe('NOT_FOUND');
     });
   });
+
+  describe('4. CORS and Preflight', () => {
+    it('allows requests and preflight from vercel domain', async () => {
+      const res = await request(app)
+        .options('/api/study/generate')
+        .set('Origin', 'https://recall-kit.vercel.app')
+        .set('Access-Control-Request-Method', 'POST')
+        .set('Access-Control-Request-Headers', 'Content-Type');
+
+      expect(res.status).toBe(200);
+      expect(res.headers['access-control-allow-origin']).toBe('https://recall-kit.vercel.app');
+    });
+  });
 });

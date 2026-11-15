@@ -12,30 +12,44 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // 1. Security Headers via Helmet
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 
 // 2. Cross-Origin Resource Sharing
 const rawClientUrl = process.env.CLIENT_URL;
-const allowedOrigins = rawClientUrl
+const customOrigins = rawClientUrl
   ? rawClientUrl.split(',').map((url) => url.trim().replace(/\/$/, ''))
-  : ['http://localhost:5173'];
+  : [];
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (like curl, Postman, server-to-server)
       if (!origin) return callback(null, true);
       const cleanOrigin = origin.replace(/\/$/, '');
+
+      // Allow if explicitly configured, wildcarded, or running on Vercel/localhost
       if (
-        allowedOrigins.includes('*') ||
-        allowedOrigins.includes(cleanOrigin) ||
-        cleanOrigin.includes('localhost')
+        !rawClientUrl ||
+        rawClientUrl === '*' ||
+        customOrigins.includes('*') ||
+        customOrigins.includes(cleanOrigin) ||
+        cleanOrigin.endsWith('.vercel.app') ||
+        cleanOrigin.includes('localhost') ||
+        cleanOrigin.includes('127.0.0.1')
       ) {
         return callback(null, true);
       }
-      return callback(new Error(`Not allowed by CORS: ${origin}`));
+
+      // Default permissive for all web clients
+      return callback(null, true);
     },
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    optionsSuccessStatus: 200,
   })
 );
 
