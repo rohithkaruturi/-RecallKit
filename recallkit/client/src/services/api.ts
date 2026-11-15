@@ -1,6 +1,11 @@
 import type { StudySet, GenerateRequest, ApiResult } from '../../../shared/types';
 
-const API_BASE = '/api';
+const envUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
+const API_BASE = envUrl
+  ? envUrl.endsWith('/api')
+    ? envUrl
+    : `${envUrl.replace(/\/$/, '')}/api`
+  : '/api';
 
 /**
  * Sends study notes to the backend for AI generation, schema validation, and enrichment.

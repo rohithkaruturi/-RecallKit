@@ -90,7 +90,9 @@ export async function generateContentWithGroq(prompt: string): Promise<string> {
       );
     }
 
-    const payload = await response.json();
+    const payload = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
     const text = payload?.choices?.[0]?.message?.content;
 
     if (!text || typeof text !== 'string' || text.trim() === '') {
