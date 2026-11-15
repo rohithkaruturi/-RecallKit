@@ -11,6 +11,9 @@
     "allowImportingTsExtensions": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "paths": {
+      "zod": ["./node_modules/zod"]
+    },
 
     /* JSX */
     "jsx": "react-jsx",
