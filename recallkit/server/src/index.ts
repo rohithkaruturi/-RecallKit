@@ -42,6 +42,19 @@ app.use(
 // 3. Request-size limit (50kb prevents memory exhaustion)
 app.use(express.json({ limit: '50kb' }));
 
+// Root welcome endpoint
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({
+    name: 'RecallKit API Server',
+    status: 'running',
+    healthCheck: '/api/health',
+    endpoints: {
+      health: 'GET /api/health',
+      generate: 'POST /api/study/generate',
+    },
+  });
+});
+
 // 4. Health Check Endpoint
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({
